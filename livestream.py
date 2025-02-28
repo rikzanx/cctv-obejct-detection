@@ -1,3 +1,4 @@
+import os
 import cv2
 import supervision as sv
 from ultralytics import YOLO
@@ -21,18 +22,22 @@ subtype = os.getenv("RTSP_SUBTYPE")
 rtsp_url = f"rtsp://{username}:{password}@{ip}:{port}/cam/realmonitor?channel={channel}&subtype={subtype}"
 
 # Buka RTSP stream
-cap = cv2.VideoCapture(rtsp_url)
+# cap = cv2.VideoCapture(rtsp_url)
+cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
+cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)
 
 if not cap.isOpened():
     print("Error: Tidak dapat membuka RTSP stream.")
     exit()
 
+cv2.namedWindow("RTSP Stream with YOLO Detection", cv2.WINDOW_NORMAL)
+
 # Loop untuk membaca frame secara real-time
 while True:
     ret, frame = cap.read()
-    if not ret:
-        print("Error: Tidak dapat membaca frame dari stream.")
-        break
+    # if not ret:
+    #     print("Error: Tidak dapat membaca frame dari stream.")
+    #     break
 
     # Jalankan YOLO inference
     results = model(frame)[0]
